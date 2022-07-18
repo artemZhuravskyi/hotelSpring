@@ -27,7 +27,7 @@ public class RoomService {
 
     private final RoomRepository roomRepository;
     private final OrderRepository orderRepository;
-    private final InvoiceService invoiceService;
+    private final OrderService orderService;
     public final static int PAGE_SIZE = 10;
 
     public Room showRoom(Long id) {
@@ -45,17 +45,8 @@ public class RoomService {
         }
 
         Room room = roomRepository.findById(reservationDTO.getRoomId()).get();
-        Order order = Order.builder()
-                .room(room)
-                .client(currentUser)
-                .firstDate(reservationDTO.getFirstDate())
-                .lastDate(reservationDTO.getLastDate())
-                .creationDate(LocalDate.now())
-                .status(NOT_PAID)
-                .build();
-        invoiceService.createInvoice(order);
-        orderRepository.save(order);
 
+        orderService.createOrder(room, currentUser, reservationDTO);
     }
 
     public boolean isReservationDateValid(ReservationDTO reservationDTO) {
@@ -71,7 +62,6 @@ public class RoomService {
         Pageable pageable = PageRequest.of(pageNo - 1, PAGE_SIZE, sort);
         return orderRepository.findAll(pageable);
     }
-
 
 
 }

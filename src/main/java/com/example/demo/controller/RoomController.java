@@ -33,7 +33,6 @@ public class RoomController {
         String dir = "asc".equalsIgnoreCase(direction.orElse("asc")) ? "asc" : "desc";
         Page<Order> page = roomService.getPaginated(currentPage, sort, dir);
         List<Order> orders = page.getContent();
-
         model.addAttribute("rooms", roomService.showAllRooms());
         model.addAttribute("orders", orders);
         model.addAttribute("currentPage", pageNo);

@@ -21,17 +21,21 @@ public class Order {
     private Room room;
     @ManyToOne
     private User client;
-    @OneToOne(mappedBy = "order")
+    @OneToOne(mappedBy = "order", cascade = CascadeType.REMOVE)
     private Invoice invoice;
 
     private LocalDate firstDate;
     private LocalDate lastDate;
     private LocalDate creationDate;
+    private Long price;
+    @Enumerated(EnumType.STRING)
     private Status status;
 
     public enum Status {
         PAID,
         NOT_PAID
     }
+
+
 
 }

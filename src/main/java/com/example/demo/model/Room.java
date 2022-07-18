@@ -23,11 +23,14 @@ public class Room {
     private List<Order> orders;
 
     private Long personNumber;
+    @Enumerated(EnumType.STRING)
     private RoomClass roomClass;
-//    @Enumerated(EnumType.STRING)
+    @Enumerated(EnumType.STRING)
     private Status status;
+    private Long price;
+    private String pathToImage;
 
-    enum Status {
+    private enum Status {
         FREE,
         BOOKED,
         BUSY,
