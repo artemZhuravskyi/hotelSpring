@@ -1,40 +1,47 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-<div class="col">
-  <div class="card shadow-sm">
-    <div class="bg-image hover-overlay hover-zoom hover-shadow ripple">
-    <img src="img/${room.getPathToImage()}"
-         style="object-fit: cover;" width="100%" height="350"/>
-    <a href="#">
-      <div class="mask" style="background-color: rgba(57, 192, 237, 0.2)"></div>
-    </a>
-    </div>
-    <div class="card-body">
-      <div class="row" style="height: 84px">
-      <div class="col-9">
-        <p>Очень крутой номер, там ты блин можешь кайфовать и тррахаться</p>
-      </div>
-      <div class="col">
-      <table class="table table-borderless">
+<div class="col mb-4" >
+    <div class="card shadow-sm" style="background-color: rgb(230, 255, 255)">
 
-        <tbody>
-          <tr style="height: 30px">
-            <td class="fw-bold">Person</td>
-            <td class="float-end">${room.getPersonNumber()}</td>
-          </tr>
-          <tr>
-            <td class="fw-bold">Price</td>
-            <td class="float-end">${room.getPrice()}</td>
-          </tr>
-        </tbody>
-      </table>
-      </div>
-      </div>
-    <div class="float-end d-grid gap-2 mx-auto " style="width:246px">
-      <button type="submit" class="btn btn-lg btn-outline-secondary">Order</button>
-    </div>
-    </div>
+            <c:set var="id">${room.getId()}</c:set>
+            <c:set var="roomPath">${room.getImages().toString()}</c:set>
+            <c:set var="bedroom">${room.getImages().getBedroom()}</c:set>
+        <a href="/room-${id}-info">
+            <div class="image">
+                <img src="img/${roomPath}/${bedroom}" style="object-fit: cover;" width="100%" height="350"/>
+                <div class="overlay">
+                    <div class="text"><h2 class="title">Подробнее</h2></div>
+                </div>
+            </div>
+        </a>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-9">
+                    <p>Очень крутой номер, там ты блин можешь кайфовать и тррахаться</p>
+                </div>
+                <div class="col">
+                    <table class="table table-borderless mb-2">
 
-  </div>
+                        <tbody>
+                        <tr style="height: 30px">
+                            <td class="fw-bold ps-0">Person</td>
+                            <td class="float-end pe-0">${room.getPersonNumber()}</td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold ps-0">Price</td>
+                            <td class="float-end pe-0">${room.getPrice()}</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    <div class="d-grid gap-2 mx-auto h-25">
+                        <a href="/room-${id}-order">
+                        <button type="button" id="button" class="col-12 btn-lg">Order</button>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
 </div>

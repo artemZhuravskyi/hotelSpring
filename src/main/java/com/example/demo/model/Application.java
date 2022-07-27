@@ -19,15 +19,17 @@ public class Application {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @ManyToMany
+    private List<Room> room;
     @ManyToOne
-    private User client;
-    @OneToOne
-    private Room room;
 
-    private Long guestsNum;
-    private Long lengthOfStay;
-    private LocalDate date;
+    private User client;
+
+    private LocalDate firstDate;
+    private LocalDate lastDate;
+    @Enumerated(EnumType.STRING)
     private RoomClass roomClass;
+    @Enumerated(EnumType.STRING)
     private Status status;
 
     public enum Status {

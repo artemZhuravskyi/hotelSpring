@@ -25,17 +25,19 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 
     protected void configure(HttpSecurity http) throws Exception {
-        http.csrf().disable()
+        http
+                .csrf().disable()
                 .authorizeRequests()
 //                .mvcMatchers("/allUsers", "/allRequests").hasRole("ADMIN")
                 .mvcMatchers("/userPage").hasAnyRole("ADMIN", "USER", "LIBRARIAN")
 //                .mvcMatchers("/makePayment", "/addMoney", "/allPayments", "/addCardName").hasRole("USER")
-                .mvcMatchers("/**").permitAll()
+                .mvcMatchers("/**")
+                .permitAll()
                 .and()
                 .formLogin()
                 .loginPage("/login")
                 .permitAll()
-                .defaultSuccessUrl("/userPage", true)
+                .defaultSuccessUrl("/all-rooms", true)
                 .failureUrl("/login?error");
     }
 

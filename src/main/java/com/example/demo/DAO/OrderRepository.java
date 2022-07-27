@@ -16,5 +16,5 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     List<Order> findAllByClient(User client);
     Order findByClientAndId(User client, Long id);
     List<Order> findAllByStatus(Order.Status status);
-    List<Order> findByRoom(Room room);
+    List<Order> findAllByRoom(Room room);
 }

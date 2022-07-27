@@ -1,34 +1,25 @@
 package com.example.demo.service;
 
 
-import com.example.demo.DAO.OrderRepository;
+import com.example.demo.DAO.ApplicationRepository;
 import com.example.demo.DAO.RoomRepository;
+import com.example.demo.DTO.ApplicationDTO;
 import com.example.demo.DTO.ReservationDTO;
-import com.example.demo.model.Order;
 import com.example.demo.model.Room;
 import com.example.demo.model.User;
 import lombok.AllArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.util.List;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-
-import static com.example.demo.model.Order.Status.NOT_PAID;
+import java.util.Optional;
 
 @AllArgsConstructor
 @Service
 public class RoomService {
 
     private final RoomRepository roomRepository;
-    private final OrderRepository orderRepository;
     private final OrderService orderService;
-    public final static int PAGE_SIZE = 10;
+    private final ApplicationRepository applicationRepository;
 
     public Room showRoom(Long id) {
         return roomRepository.findById(id).get();
@@ -40,6 +31,7 @@ public class RoomService {
 
     public void bookRoom(ReservationDTO reservationDTO, User currentUser) {
 
+
         if (!isReservationDateValid(reservationDTO)) {
             return;
         }
@@ -49,19 +41,17 @@ public class RoomService {
         orderService.createOrder(room, currentUser, reservationDTO);
     }
 
+
     public boolean isReservationDateValid(ReservationDTO reservationDTO) {
-
-        Integer counted = roomRepository.countIntersectionDateQuantity(reservationDTO.getRoomId(), reservationDTO.getFirstDate(), reservationDTO.getLastDate());
-        return counted > 0;
+        Optional<Integer> counted = roomRepository.countIntersectionDateQuantity(reservationDTO.getRoomId(), reservationDTO.getFirstDate(), reservationDTO.getLastDate());
+        return counted.isEmpty();
     }
 
-    public Page<Order> getPaginated(int pageNo, String sortField, String sortDirection){
-        Sort sort = sortDirection.equalsIgnoreCase(Sort.Direction.ASC.name()) ?
-                Sort.by(sortField).ascending() : Sort.by(sortField).descending();
 
-        Pageable pageable = PageRequest.of(pageNo - 1, PAGE_SIZE, sort);
-        return orderRepository.findAll(pageable);
+    public Room showOrderingRoomById(Long id) {
+        return roomRepository.findById(id).get();
     }
+
 
 
 }
