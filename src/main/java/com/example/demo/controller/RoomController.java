@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import java.util.List;
+
 @Controller
 @AllArgsConstructor
 public class RoomController {
@@ -30,27 +32,12 @@ public class RoomController {
         return "/allRooms";
     }
 
-    @GetMapping("/room-{id}-info")
+    @GetMapping("/info-room-{id}")
     public String showRoom(Model model,
                                 @PathVariable("id") Long id) {
         model.addAttribute("room", roomService.showRoom(id));
         return "/roomInfo";
     }
 
-    @PostMapping("/book-room")
-    public String bookRoom(@RequestBody ReservationDTO reservationDTO,
-                           Authentication authentication) {
-        User currentUser = (User) authentication.getPrincipal();
-        roomService.bookRoom(reservationDTO, currentUser);
-        return "/succeededPage";
-    }
 
-    @GetMapping("/room-{roomId}-order")
-    public String showRoomById(@PathVariable("roomId") Long id,
-                               Model model) {
-
-        model.addAttribute("room", roomService.showOrderingRoomById(id));
-        model.addAttribute("reservedOrders", orderService.showAllOrdersByRoom(id));
-        return "roomOrder";
-    }
 }

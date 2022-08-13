@@ -29,28 +29,8 @@ public class RoomService {
         return roomRepository.findAll();
     }
 
-    public void bookRoom(ReservationDTO reservationDTO, User currentUser) {
 
 
-        if (!isReservationDateValid(reservationDTO)) {
-            return;
-        }
-
-        Room room = roomRepository.findById(reservationDTO.getRoomId()).get();
-
-        orderService.createOrder(room, currentUser, reservationDTO);
-    }
-
-
-    public boolean isReservationDateValid(ReservationDTO reservationDTO) {
-        Optional<Integer> counted = roomRepository.countIntersectionDateQuantity(reservationDTO.getRoomId(), reservationDTO.getFirstDate(), reservationDTO.getLastDate());
-        return counted.isEmpty();
-    }
-
-
-    public Room showOrderingRoomById(Long id) {
-        return roomRepository.findById(id).get();
-    }
 
 
 

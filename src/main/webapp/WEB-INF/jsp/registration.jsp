@@ -28,28 +28,28 @@
 <section>
     <div class="row m-0">
         <div class="col d-flex align-items-center justify-content-center">
-            <form class="needs-validation" style="width: 23rem;" novalidate>
+            <form method="post" action="/registration" class="needs-validation" style="width: 23rem;" novalidate>
 
                 <h2 class="fw-normal mb-3 pb-3" style="letter-spacing: 1px;">Sign up</h2>
 
                 <div class="form-outline mb-4">
                     <label class="form-label">First Name</label>
-                    <input type="text" class="form-control form-control-lg" id="validationCustom01" required/>
+                    <input type="text" class="form-control form-control-lg" id="validationCustom01" name="firstName" required/>
                 </div>
 
                 <div class="form-outline mb-4">
                     <label class="form-label">Last Name</label>
-                    <input type="text" class="form-control form-control-lg" id="validationCustom02" required/>
+                    <input type="text" class="form-control form-control-lg" id="validationCustom02" name="lastName" required/>
                 </div>
 
                 <div class="form-outline mb-4">
                     <label class="form-label">Email address</label>
-                    <input type="email" class="form-control form-control-lg" id="validationCustom03" required/>
+                    <input type="email" class="form-control form-control-lg" id="validationCustom03" name="email" required/>
                 </div>
 
                 <div class="form-outline mb-4">
                     <label class="form-label">Password</label>
-                    <input type="password" class="form-control form-control-lg" id="validationCustom04" required/>
+                    <input type="password" class="form-control form-control-lg" id="validationCustom04" name="password" required/>
                 </div>
 
                 <div class="pt-1 mb-3">

@@ -1,6 +1,7 @@
 package com.example.demo.model;
 
 import com.example.demo.model.enums.RoomClass;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import javax.persistence.*;
@@ -19,21 +20,16 @@ public class Application {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+//    @JsonIgnore
     @ManyToMany
     private List<Room> room;
+//    @JsonIgnore
     @ManyToOne
-
     private User client;
 
     private LocalDate firstDate;
     private LocalDate lastDate;
     @Enumerated(EnumType.STRING)
     private RoomClass roomClass;
-    @Enumerated(EnumType.STRING)
-    private Status status;
 
-    public enum Status {
-        ON_MANAGER_REVIEW,
-        ON_CLIENT_REVIEW
-    }
 }

@@ -56,9 +56,9 @@ public class UserService implements UserDetailsService {
         return userRepository.findUserByEmail(email)
                 .orElseThrow(NoSuchElementException::new);
     }
-    @ExceptionHandler(NoSuchElementException.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    protected ResponseEntity<String> handleItemNotFoundException(NoSuchElementException e) {
-        return new ResponseEntity<>("No Such Element Exceptions happen! Incorrect Data. ", HttpStatus.NOT_FOUND);
-    }
+//    @ExceptionHandler(NoSuchElementException.class)
+//    @ResponseStatus(HttpStatus.NOT_FOUND)
+//    protected ResponseEntity<String> handleItemNotFoundException(NoSuchElementException e) {
+//        return new ResponseEntity<>("No Such Element Exceptions happen! Incorrect Data. ", HttpStatus.NOT_FOUND);
+//    }
 }

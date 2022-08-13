@@ -1,11 +1,10 @@
 package com.example.demo.controller;
 
-import com.example.demo.DTO.ApplicationDTO;
 import com.example.demo.DTO.ReservationDTO;
-import com.example.demo.model.Room;
 import com.example.demo.model.User;
+import com.example.demo.model.enums.RoomClass;
 import com.example.demo.service.ApplicationService;
-import com.example.demo.service.RoomService;
+import com.example.demo.service.OrderService;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -13,15 +12,13 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
-
 @AllArgsConstructor
 @Controller
 public class ApplicationController {
 
     @Autowired
     private final ApplicationService applicationService;
-    private final RoomService roomService;
+    private final OrderService orderService;
 
     // Manager application Page
     @GetMapping("/all-applications")
@@ -34,33 +31,34 @@ public class ApplicationController {
     public String sendApplicationResponse(Long id) {
 
         ReservationDTO reservationDTO = applicationService.createReservationDTOFromApplication(id);
-        roomService.bookRoom(reservationDTO, reservationDTO.getClient());
+        orderService.orderRoom(reservationDTO, reservationDTO.getClient());
 
         return "redirect:/allUsersApplications";
     }
 
     //Client application Pages
     @GetMapping("/create-application")
-    public String enterApplicationPage() {
-        return "/applicationPage";
+    public String enterCreationApplicationPage() {
+        return "/application";
     }
 
     @PostMapping("/create-application")
-    public String createApplication(ReservationDTO reservationDTO,
+    public String createApplication(String date,
+                                    RoomClass roomClass,
                                     Authentication authentication) {
 
         User currentUser = (User) authentication.getPrincipal();
-        applicationService.createApplication(reservationDTO, currentUser);
-        return "redirect:/main";
+
+        applicationService.createApplication(applicationService.createReservationDTO(date, roomClass), currentUser);
+        return "redirect:/client-applications";
     }
 
-    @GetMapping("/applications")
-    public String enterAllClientApplications(Authentication authentication,
+    @GetMapping("/client-applications")
+    public String enterClientApplications(Authentication authentication,
                                             Model model) {
         User client = (User) authentication.getPrincipal();
-        model.addAttribute("allClientApplications", applicationService.showAllClientApplications(client));
+        model.addAttribute("clientApplications", applicationService.showClientApplications(client));
         return "/clientApplications";
     }
-
 
 }

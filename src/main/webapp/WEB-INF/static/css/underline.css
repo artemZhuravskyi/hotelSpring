@@ -1,0 +1,25 @@
+li:after, li:before {
+    display:block;
+    content: '';
+    border-bottom: solid 2px #000000;
+    transform: scaleX(0);
+    transition: transform 200ms ease-in-out;
+
+}
+
+li:hover:after { transform: scaleX(1); }
+
+thead:after {
+    /* This doesn't work because of border-collapse */
+    line-height:2em;
+    content:".";
+    color:white; /* bacground color */
+    display:block;
+}
+thead:before {
+    /* This doesn't work because of border-collapse */
+    line-height:1em;
+    content:".";
+    color:white; /* bacground color */
+    display:block;
+}

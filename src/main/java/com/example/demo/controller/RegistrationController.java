@@ -43,12 +43,14 @@ public class RegistrationController {
         model.addAttribute("exception", "");
 
         if (bindingResult.hasErrors()) {
+            System.out.println("bindRes");
             return "registration";
         }
         try {
             userService.register(userDTO);
         } catch (UserException e) {
             model.addAttribute("exception", userDTO.getEmail());
+            System.out.println("register");
             return "registration";
         }
 

@@ -1,5 +1,6 @@
 package com.example.demo.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import javax.persistence.*;
@@ -17,11 +18,14 @@ public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @JsonIgnore
     @ManyToOne
     private Room room;
+    @JsonIgnore
     @ManyToOne
     private User client;
-    @OneToOne(mappedBy = "order", cascade = CascadeType.REMOVE)
+    @JsonIgnore
+    @OneToOne(mappedBy = "order")
     private Invoice invoice;
 
     private LocalDate firstDate;

@@ -30,6 +30,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
 //                .mvcMatchers("/allUsers", "/allRequests").hasRole("ADMIN")
                 .mvcMatchers("/userPage").hasAnyRole("ADMIN", "USER", "LIBRARIAN")
+
 //                .mvcMatchers("/makePayment", "/addMoney", "/allPayments", "/addCardName").hasRole("USER")
                 .mvcMatchers("/**")
                 .permitAll()

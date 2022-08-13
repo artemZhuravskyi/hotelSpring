@@ -24,14 +24,15 @@ public class InvoiceService {
                 .order(order)
                 .status(NOT_PAID)
                 .build();
-        invoiceRepository.save(invoice);
+        order.setInvoice(invoice);
     }
 
 
 
-    @Transactional
+
     public void payInvoice(Invoice invoice) {
         invoice.setStatus(PAID);
+        invoiceRepository.save(invoice);
     }
 
 

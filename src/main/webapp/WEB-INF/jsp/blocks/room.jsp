@@ -6,7 +6,7 @@
             <c:set var="id">${room.getId()}</c:set>
             <c:set var="roomPath">${room.getImages().toString()}</c:set>
             <c:set var="bedroom">${room.getImages().getBedroom()}</c:set>
-        <a href="/room-${id}-info">
+        <a href="info-room-${id}">
             <div class="image">
                 <img src="img/${roomPath}/${bedroom}" style="object-fit: cover;" width="100%" height="350"/>
                 <div class="overlay">
@@ -17,7 +17,7 @@
         <div class="card-body">
             <div class="row">
                 <div class="col-9">
-                    <p>Очень крутой номер, там ты блин можешь кайфовать и тррахаться</p>
+                    <p></p>
                 </div>
                 <div class="col">
                     <table class="table table-borderless mb-2">
@@ -34,7 +34,7 @@
                         </tbody>
                     </table>
                     <div class="d-grid gap-2 mx-auto h-25">
-                        <a href="/room-${id}-order">
+                        <a href="order-room-${id}">
                         <button type="button" id="button" class="col-12 btn-lg">Order</button>
                         </a>
                     </div>

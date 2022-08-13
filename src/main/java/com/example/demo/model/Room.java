@@ -1,6 +1,7 @@
 package com.example.demo.model;
 
 import com.example.demo.model.enums.RoomClass;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import javax.persistence.*;
@@ -18,11 +19,13 @@ public class Room {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+//    @JsonIgnore
     @OneToMany(mappedBy = "room")
     private List<Order> orders;
+//    @JsonIgnore
     @OneToOne(mappedBy = "room", cascade = CascadeType.REMOVE)
     private Image images;
-
+//    @JsonIgnore
     @ManyToMany(mappedBy = "room")
     private List<Application> application;
 

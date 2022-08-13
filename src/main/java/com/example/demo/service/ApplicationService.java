@@ -2,21 +2,21 @@ package com.example.demo.service;
 
 import com.example.demo.DAO.ApplicationRepository;
 import com.example.demo.DAO.RoomRepository;
-import com.example.demo.DTO.ApplicationDTO;
 import com.example.demo.DTO.ReservationDTO;
 import com.example.demo.model.Application;
 import com.example.demo.model.Room;
 import com.example.demo.model.User;
+import com.example.demo.model.enums.RoomClass;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-
-import static com.example.demo.model.Application.Status.*;
-import static com.example.demo.model.Room.Status.*;
-
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static com.example.demo.model.Room.Status.BOOKED;
 
 @Service
 @AllArgsConstructor
@@ -24,6 +24,7 @@ public class ApplicationService {
 
     private final ApplicationRepository applicationRepository;
     private final RoomRepository roomRepository;
+    private final OrderService orderService;
     private final RoomService roomService;
 
     public void createApplication(ReservationDTO reservationDTO, User currentUser) {
@@ -33,12 +34,24 @@ public class ApplicationService {
                 .lastDate(reservationDTO.getLastDate())
                 .roomClass(reservationDTO.getRoomClass())
                 .room(findApplicationRoomsByFilter(reservationDTO))
-                .status(ON_MANAGER_REVIEW)
                 .build();
         applicationRepository.save(application);
+
     }
 
-    public List<Application> showAllClientApplications(User currentUser) {
+
+    public ReservationDTO createReservationDTO(String date, RoomClass roomClass) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
+
+        String[] firstDateAndLastDate = orderService.splitDateToFirstDateAndLastDate(date);
+        return ReservationDTO.builder()
+                .firstDate(LocalDate.parse(firstDateAndLastDate[0], formatter))
+                .lastDate(LocalDate.parse(firstDateAndLastDate[1], formatter))
+                .roomClass(roomClass)
+                .build();
+    }
+
+    public List<Application> showClientApplications(User currentUser) {
         return applicationRepository.findAllByClient(currentUser);
     }
 
@@ -50,7 +63,6 @@ public class ApplicationService {
     public void updateApplication(Long id) {
         Room room = roomRepository.findById(id).get();
         Application currentApp = applicationRepository.findByRoom(room);
-        currentApp.setStatus(ON_CLIENT_REVIEW);
         List<Room> room1 = currentApp.getRoom();
         room1.forEach(x -> x.setStatus(BOOKED));
     }
@@ -67,18 +79,13 @@ public class ApplicationService {
                 .client(currentApp.getClient())
                 .build();
         applicationRepository.delete(currentApp);
-
         return reservationDTO;
     }
 
-    private List<Room> findApplicationRoomsByFilter(ReservationDTO reservationDTO){
-
+    private List<Room> findApplicationRoomsByFilter(ReservationDTO reservationDTO) {
         List<Room> rooms = roomRepository.findAll();
-
         rooms = rooms.stream().filter(x -> x.getRoomClass().equals(reservationDTO.getRoomClass())
-                && roomService.isReservationDateValid(reservationDTO)).collect(Collectors.toList());
-
-
+                && orderService.isReservationDateValid(reservationDTO)).collect(Collectors.toList());
         return rooms;
     }
 

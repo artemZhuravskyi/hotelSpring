@@ -29,43 +29,7 @@
 <body>
 
 <header id="header">
-    <div class="collapse bg-dark" id="navbarHeader">
-        <div class="container">
-            <div class="row">
-                <div class="col-sm-8 col-md-7 py-4">
-                    <h4 class="text-white">About</h4>
-                    <p class="text-muted">Add some information about the album below, the author, or any other
-                        background context. Make it a few sentences long so folks can pick up some informative tidbits.
-                        Then, link them off to some social networking sites or contact information.</p>
-                </div>
-                <div class="col-sm-4 offset-md-1 py-4">
-                    <h4 class="text-white">Contact</h4>
-                    <ul class="list-unstyled">
-                        <li><a href="#" class="text-white">Крутотень</a></li>
-                        <li><a href="#" class="text-white">Like on Facebook</a></li>
-                        <li><a href="#" class="text-white">Email me</a></li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="navbar navbar-dark bg-dark shadow-sm fixed-top">
-        <div class="container">
-            <a href="#" class="navbar-brand d-flex align-items-center">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor"
-                     stroke-linecap="round" stroke-linejoin="round" stroke-width="2" aria-hidden="true" class="me-2"
-                     viewBox="0 0 24 24">
-                    <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
-                    <circle cx="12" cy="13" r="4"/>
-                </svg>
-                <strong>Album</strong>
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarHeader"
-                    aria-controls="navbarHeader" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-        </div>
-    </div>
+    <jsp:include page="blocks/header.jsp"/>
 </header>
 
 <main class="custom py-4">
@@ -76,7 +40,7 @@
 
             <img class="col-3" src="img/border.png" style="height: 90px; object-fit: cover">
             <h1 class="col-4 col-md-auto d-flex align-self-center justify-content-center mx-4">
-                ${room.getRoomClass().toString()} • Номер ${room.getId()}</h1>
+                ${room.getRoomClass().toString()} • Номер №${room.getId()}</h1>
             <img class="col-3" src="img/border.png" style="height: 90px; object-fit: cover">
         </div>
 
@@ -114,24 +78,24 @@
                     </button>
                 </div>
             </div>
-            <div class="row justify-content-center">
-                <div class="col-6 pt-3">
-                    <div class="card-body">
+            <div class="row pt-3">
+                <div class="col">
+                    <div class="card-body position-relative " style="left: 200px; width: 276px">
                         <h4 class="text-center fw-bold">Удобства</h4>
                         <p class="text-center">Кодиционер, ванная, две кровати, балкон</p>
                     </div>
                 </div>
-                <div class="col-6 pt-3">
-                    <div class="col-8 float end">
-                        <table class="table table-borderless">
+                <div class="col">
+                    <div class="position-relative pt-3" style="left: 150px; width: 276px; ">
+                        <table class="table table-borderless" >
                             <tbody>
                             <tr>
                                 <td class="fw-bold">Person</td>
-                                <td>${room.getPersonNumber()}</td>
+                                <td class="float-end">${room.getPersonNumber()}</td>
                             </tr>
                             <tr>
                                 <td class="fw-bold">Price</td>
-                                <td>${room.getPrice()}</td>
+                                <td class="float-end">${room.getPrice()}</td>
                             </tr>
                             </tbody>
                         </table>
@@ -141,7 +105,9 @@
             <div class="row justify-content-center">
                 <img class="col-3 me-5" src="img/border.png" style="height: 90px; width: 300px; object-fit: cover">
                 <div class="col-2 h-75 align-self-center">
+                    <a href="order-room-${id}">
                     <button type="submit" id="button" class="col-12 btn-lg" >Order</button>
+                    </a>
                 </div>
                 <img class="col-3 ms-5" src="img/border.png" style="height: 90px; width: 300px; object-fit: cover">
             </div>

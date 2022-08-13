@@ -3,13 +3,12 @@ package com.example.demo.service;
 import com.example.demo.DAO.OrderRepository;
 import com.example.demo.DAO.RoomRepository;
 import com.example.demo.DTO.ReservationDTO;
-import com.example.demo.model.Invoice;
-import com.example.demo.model.Order;
-import com.example.demo.model.Room;
-import com.example.demo.model.User;
+import com.example.demo.model.*;
 import lombok.AllArgsConstructor;
 import net.sf.jasperreports.engine.*;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
+import org.apache.log4j.Logger;
+import org.jfree.util.Log;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -29,9 +28,12 @@ import javax.mail.internet.MimeMultipart;
 import javax.mail.util.ByteArrayDataSource;
 import javax.transaction.Transactional;
 import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoField;
 import java.time.temporal.ChronoUnit;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.example.demo.model.Order.Status.NOT_PAID;
 import static com.example.demo.model.Order.Status.PAID;
@@ -42,19 +44,20 @@ public class OrderService {
 
     private OrderRepository orderRepository;
     private InvoiceService invoiceService;
+    final static Logger logger = Logger.getLogger(OrderService.class);
 
-    public final static int PAGE_SIZE = 10;
     private RoomRepository roomRepository;
 
-    public List<Order> showOrders(User currentUser) {
-        return orderRepository.findAllByClient(currentUser);
+
+    public List<Order> findOrdersByClient(User client) {
+        return orderRepository.findAllByClient(client);
     }
 
-
-    private byte[] bytePdfFile() {
+    private byte[] bytePdfFile(Order order) {
         try {
 
-            List<Order> allOrder = orderRepository.findAll();
+            List<Order> allOrder = new ArrayList<>();
+            allOrder.add(orderRepository.findById(order.getId()).get());
 
             JasperReport jasperReport = JasperCompileManager
                     .compileReport("C:\\Users\\iisus\\Desktop\\demo\\src\\main\\resources\\templates\\jrxml\\invoice.jrxml");
@@ -69,7 +72,42 @@ public class OrderService {
         return null;
     }
 
-    private void generateReport() {
+    public boolean isReservationDateValid(ReservationDTO reservationDTO) {
+        Optional<Integer> counted = roomRepository.countIntersectionDateQuantity(reservationDTO.getRoomId(),
+                reservationDTO.getLastDate(), reservationDTO.getFirstDate());
+        return counted.isEmpty();
+    }
+
+    public String[] splitDateToFirstDateAndLastDate(String date) {
+        return date.split(" - ");
+    }
+
+    public void orderRoomById(String dateRange, Long id, User currentUser) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
+        String[] dates = splitDateToFirstDateAndLastDate(dateRange);
+
+        ReservationDTO reservationDTO = ReservationDTO.builder()
+                .firstDate(LocalDate.parse(dates[0], formatter))
+                .lastDate(LocalDate.parse(dates[1], formatter))
+                .roomId(id)
+                .roomClass(roomRepository.findById(id).get().getRoomClass())
+                .build();
+
+        orderRoom(reservationDTO, currentUser);
+    }
+
+    public void orderRoom(ReservationDTO reservationDTO, User currentUser) {
+
+        if (!isReservationDateValid(reservationDTO)) {
+            return;
+        }
+
+        Room room = roomRepository.findById(reservationDTO.getRoomId()).get();
+
+        createOrder(room, currentUser, reservationDTO);
+    }
+
+    private void generateReport(Order order) {
 
         final String username = "hotelCaliforniaKyiv@gmail.com";
         final String password = "bpmbmgbemyypqrln";
@@ -90,7 +128,7 @@ public class OrderService {
 
         try {
             //construct the pdf body part
-            DataSource dataSource = new ByteArrayDataSource(bytePdfFile(), "application/pdf");
+            DataSource dataSource = new ByteArrayDataSource(bytePdfFile(order), "application/pdf");
             MimeBodyPart pdfBodyPart = new MimeBodyPart();
             pdfBodyPart.setDataHandler(new DataHandler(dataSource));
 
@@ -118,7 +156,7 @@ public class OrderService {
     }
 
 
-    @Transactional
+
     public void payOrder(Long id, User currentUser) {
 
         Order order = orderRepository.findByClientAndId(currentUser, id);
@@ -126,13 +164,14 @@ public class OrderService {
 
 //        generateReport(currentUser,);
 
-        if (isDateExpired(order)) {
-            withDrawPayment(order);
-        }
+//        if (isDateExpired(order)) {
+//            withDrawPayment(order);
+//        }
 
         Invoice invoice = order.getInvoice();
         order.setStatus(PAID);
         invoiceService.payInvoice(invoice);
+        generateReport(order);
     }
 
 
@@ -166,10 +205,10 @@ public class OrderService {
     }
 
     private Long countLengthOfStay(ReservationDTO reservationDTO) {
-        return ChronoUnit.DAYS.between(reservationDTO.getFirstDate(), reservationDTO.getLastDate());
+        return ChronoUnit.DAYS.between(reservationDTO.getFirstDate(), reservationDTO.getLastDate()) + 1L;
     }
 
-    protected void createOrder(Room room, User currentUser, ReservationDTO reservationDTO) {
+    public void createOrder(Room room, User currentUser, ReservationDTO reservationDTO) {
         Order order = Order.builder()
                 .room(room)
                 .client(currentUser)
@@ -182,16 +221,34 @@ public class OrderService {
         orderRepository.save(order);
     }
 
-    public Page<Order> getPaginated(int pageNo, String sortField, String sortDirection){
-        Sort sort = sortDirection.equalsIgnoreCase(Sort.Direction.ASC.name()) ?
-                Sort.by(sortField).ascending() : Sort.by(sortField).descending();
-
-        Pageable pageable = PageRequest.of(pageNo - 1, PAGE_SIZE, sort);
-        return orderRepository.findAll(pageable);
+    public List<Long> ordersToDates(List<Order> orders) {
+        ZoneId zoneId = ZoneId.systemDefault();
+        logger.info("Orders: " + orders);
+        return orders.stream()
+                .map(x -> fromFDtoLD(x.getFirstDate(), x.getLastDate()))
+                .flatMap(Collection::stream)
+                .map(y -> y.atStartOfDay(zoneId).toInstant().toEpochMilli()).collect(Collectors.toList());
     }
 
-    public List<Order> showAllOrdersByRoom(Long id) {
+    public List<Order> showAllOrdersByRoomAndLastDayAfter(Long id) {
         Room room = roomRepository.findById(id).get();
-        return orderRepository.findAllByRoom(room);
+        return orderRepository.findAllByRoomAndLastDateAfter(room, LocalDate.now());
     }
+
+
+    private List<LocalDate> fromFDtoLD(LocalDate firstDate, LocalDate lastDate) {
+        List<LocalDate> dateList = new ArrayList<>();
+        LocalDate temp = firstDate;
+        dateList.add(temp);
+        while(!temp.equals(lastDate)) {
+            temp = temp.plusDays(1);
+            dateList.add(temp);
+        }
+        return dateList;
+    }
+
+    public List<Order> findOrdersWithPaginationAndSort(User client, int pageNum, int pageSize, String sorting){
+        return orderRepository.findAllByClient(client, PageRequest.of(pageNum, pageSize).withSort(Sort.by(sorting)));
+    }
+
 }

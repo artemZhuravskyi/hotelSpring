@@ -2,6 +2,7 @@ package com.example.demo.model;
 
 
 import com.example.demo.model.enums.Role;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -24,8 +25,10 @@ public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+//    @JsonIgnore
     @OneToMany (mappedBy = "client")
     private List<Order> room;
+//    @JsonIgnore
     @OneToMany(mappedBy = "client")
     private List<Application> application;
 
