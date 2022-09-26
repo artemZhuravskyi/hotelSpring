@@ -1,6 +1,9 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+
+<fmt:setBundle basename="messages"/>
 <!doctype html>
 <html lang="en">
 <head>
@@ -38,15 +41,20 @@
 
 <main class="custom pt-5">
 
-    <section class="text-center bg-gradient" >
-        <div class="py-lg-3" style="background: rgb(230,255,255) linear-gradient(180deg, rgba(230,255,255,1) 90%, rgba(255,255,255,1) 100%);">
+    <section class="text-center bg-gradient mt-5 ">
+        <div class="py-lg-3"
+             style="background: rgb(255,255,255);
+background: linear-gradient(0deg, rgba(255,255,255,1) 0%, rgba(230,255,255,1) 25%, rgba(230,255,255,1) 50%, rgba(230,255,255,1) 75%, rgba(255,255,255,1) 100%);">
             <div class="col-lg-6 col-md-8 mx-auto">
-                <h1 class="fw-light fw-bold">Мы подберём тебе номер!</h1>
-                <p class="lead text-muted">Не знаешь какой хочешь номер? Выставь желаемые тербования, и мы сами найдем
-                    лучший для тебя вариант!</p>
-                <div class="col-4 d-grid mx-auto h-25">
-                    <button type="submit" id="button" class="btn-lg">Подобрать номер</button>
+                <h1 class="fw-light fw-bold"><fmt:message key="all_rooms_announcement"/></h1>
+                <p class="lead text-muted"><fmt:message key="all_rooms_announcement_description"/></p>
+
+                <div class="col-4 d-grid mx-auto">
+                    <a href="/create-application">
+                        <button type="submit" id="button" class="btn-lg"><fmt:message key="all_rooms_announcement_button"/></button>
+                    </a>
                 </div>
+
             </div>
         </div>
     </section>
@@ -55,7 +63,7 @@
         <div class="row justify-content-md-center mb-2">
 
             <img class="col-3" src="img/border.png" style="height: 90px; object-fit: cover">
-            <h1 class="col-4 col-md-auto d-flex align-self-center justify-content-center mx-4">Номера и цены</h1>
+            <h1 class="col-4 col-md-auto d-flex align-self-center justify-content-center mx-4"><fmt:message key="rooms_and_prices"/></h1>
             <img class="col-3" src="img/border.png" style="height: 90px; object-fit: cover">
         </div>
         <div class="container">
@@ -64,16 +72,16 @@
                     <c:set var="room" value="${room}" scope="request"/>
                     <c:if test="${room.getImages().toString().contains('1')}">
                         <c:if test="${room.getRoomClass().name() == 'ECONOMY'}">
-                            <h1>Economy</h1>
+                            <h1><fmt:message key="Economy"/></h1>
                         </c:if>
                         <c:if test="${room.getRoomClass().name() == 'STANDARD'}">
-                            <h1>Standard</h1>
+                            <h1><fmt:message key="Standard"/></h1>
                         </c:if>
                         <c:if test="${room.getRoomClass().name() == 'JUNIOR_SUITE'}">
-                            <h1>Junior Suite</h1>
+                            <h1><fmt:message key="Junior suite"/></h1>
                         </c:if>
                         <c:if test="${room.getRoomClass().name() == 'SUITE'}">
-                            <h1>Suite</h1>
+                            <h1><fmt:message key="Suite"/></h1>
                         </c:if>
                     </c:if>
                     <div>
@@ -86,14 +94,12 @@
 
 </main>
 
-<footer class="text-muted py-5">
+<footer class="text-muted">
     <div class="container">
-        <p class="float-end mb-1">
-            <a href="#">Back to top</a>
+        <p class="float-end ">
+            <a href="#"><button class="btn" id="button"><fmt:message key="back_to_top"/></button></a>
         </p>
-        <p class="mb-1">Album example is &copy; Bootstrap, but please download and customize it for yourself!</p>
-        <p class="mb-0">New to Bootstrap? <a href="/">Visit the homepage</a> or read our <a
-                href="/docs/5.0/getting-started/introduction/">getting started guide</a>.</p>
+
     </div>
 </footer>
 

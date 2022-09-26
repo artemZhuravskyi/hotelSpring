@@ -19,7 +19,7 @@ public interface OrderRepository extends JpaRepository<Order, Long>, PagingAndSo
     List<Order> findAllByClient(User client);
     List<Order> findAllByClient(User client, Pageable pageable);
     Order findByClientAndId(User client, Long id);
-    List<Order> findAllByRoom(Room room);
     List<Order> findAllByRoomAndLastDateAfter(Room room, LocalDate localDate);
 
+    List<Order> findAllByStatus(Order.Status notPaid);
 }

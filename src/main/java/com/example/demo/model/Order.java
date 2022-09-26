@@ -22,7 +22,7 @@ public class Order {
     @ManyToOne
     private Room room;
     @JsonIgnore
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     private User client;
     @JsonIgnore
     @OneToOne(mappedBy = "order")

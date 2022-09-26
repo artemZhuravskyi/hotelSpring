@@ -13,6 +13,4 @@ import java.util.List;
 public interface ApplicationRepository extends JpaRepository<Application, Long> {
 
     List<Application> findAllByClient(User user);
-
-    Application findByRoom(Room room);
 }

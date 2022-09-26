@@ -1,6 +1,9 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+
+<fmt:setBundle basename="messages"/>
 <!doctype html>
 <html lang="en">
 <head>
@@ -11,7 +14,7 @@
     <meta name="author" content="zhuravksuyio arte,m">
     <meta name="generator" content="Hugo 0.84.0">
     <meta name="theme-color" content="#7952b3">
-    <title>Rooms and Prices</title>
+    <title><fmt:message key="room_order_title"/></title>
 
     <style>
         .custom {
@@ -44,8 +47,8 @@
         <div class="row justify-content-md-center mb-2">
 
             <img class="col-3" src="img/border.png" style="height: 90px; object-fit: cover">
-            <h1 class="col-4 col-md-auto d-flex align-self-center justify-content-center mx-4">${room.getRoomClass().toString()}
-                • Номер №${room.getId()}</h1>
+            <h1 class="col-4 col-md-auto d-flex align-self-center justify-content-center mx-4"><fmt:message key="${room.getRoomClass().toString()}"/>
+                • <fmt:message key="room_num"/>${room.getId()}</h1>
             <img class="col-3" src="img/border.png" style="height: 90px; object-fit: cover">
         </div>
         <c:set var="roomPath">${room.getImages().toString()}</c:set>
@@ -85,11 +88,11 @@
                         <table class="table table-borderless" >
                             <tbody>
                             <tr>
-                                <td class="fw-bold">Person</td>
+                                <td class="fw-bold"><fmt:message key="person"/></td>
                                 <td class="float-end">${room.getPersonNumber()}</td>
                             </tr>
                             <tr>
-                                <td class="fw-bold">Price</td>
+                                <td class="fw-bold"><fmt:message key="price"/></td>
                                 <td class="float-end">${room.getPrice()}</td>
                             </tr>
                             </tbody>
@@ -107,7 +110,7 @@
                                     <div class="col">
 
                                         <button id="button" class="btn-lg" type="submit"
-                                                style="background-color: rgb(245, 255, 255)">Order
+                                                style="background-color: rgb(245, 255, 255)"><fmt:message key="order_button"/>
                                         </button>
                                     </div>
                                 </div>

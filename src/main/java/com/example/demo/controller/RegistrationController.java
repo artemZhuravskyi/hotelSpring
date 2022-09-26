@@ -1,8 +1,12 @@
 package com.example.demo.controller;
 
 import com.example.demo.DTO.UserDTO;
+import com.example.demo.exception.EmailException;
+import com.example.demo.exception.PasswordException;
 import com.example.demo.exception.UserException;
+import com.example.demo.service.OrderService;
 import com.example.demo.service.UserService;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -17,6 +21,7 @@ import javax.validation.Valid;
 public class RegistrationController {
 
     private final UserService userService;
+    final static Logger logger = Logger.getLogger(RegistrationController.class);
 
     @Autowired
     public RegistrationController(UserService userService) {
@@ -39,18 +44,19 @@ public class RegistrationController {
             BindingResult bindingResult,
             Model model) {
 
-
-        model.addAttribute("exception", "");
-
-        if (bindingResult.hasErrors()) {
-            System.out.println("bindRes");
-            return "registration";
-        }
+//        if (bindingResult.hasErrors()) {
+//            System.out.println("bindRes");
+//            return "registration";
+//        }
         try {
             userService.register(userDTO);
-        } catch (UserException e) {
-            model.addAttribute("exception", userDTO.getEmail());
-            System.out.println("register");
+        } catch (EmailException e) {
+            model.addAttribute("emailException", userDTO.getEmail());
+            logger.info(e);
+            return "registration";
+        } catch (PasswordException e) {
+            model.addAttribute("passwordException", userDTO.getPassword());
+            logger.info(e);
             return "registration";
         }
 

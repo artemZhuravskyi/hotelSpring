@@ -10,7 +10,6 @@ import com.example.demo.model.enums.RoomClass;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import javax.transaction.Transactional;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -25,7 +24,6 @@ public class ApplicationService {
     private final ApplicationRepository applicationRepository;
     private final RoomRepository roomRepository;
     private final OrderService orderService;
-    private final RoomService roomService;
 
     public void createApplication(ReservationDTO reservationDTO, User currentUser) {
         Application application = Application.builder()
@@ -59,18 +57,18 @@ public class ApplicationService {
         return applicationRepository.findAll();
     }
 
-    @Transactional
-    public void updateApplication(Long id) {
-        Room room = roomRepository.findById(id).get();
-        Application currentApp = applicationRepository.findByRoom(room);
-        List<Room> room1 = currentApp.getRoom();
-        room1.forEach(x -> x.setStatus(BOOKED));
+
+    public void updateApplication(Long applicationId) {
+        Application currentApp = applicationRepository.findById(applicationId).get();
+        List<Room> rooms = currentApp.getRoom();
+        rooms.forEach(room -> room.setStatus(BOOKED));
+        roomRepository.saveAll(rooms);
     }
 
-    public ReservationDTO createReservationDTOFromApplication(Long id) {
-        updateApplication(id);
-        Room room = roomRepository.findById(id).get();
-        Application currentApp = applicationRepository.findByRoom(room);
+    public ReservationDTO createReservationDTOFromApplication(Long roomId, Long applicationId) {
+        updateApplication(applicationId);
+        Room room = roomRepository.findById(roomId).get();
+        Application currentApp = applicationRepository.findById(applicationId).get();
         ReservationDTO reservationDTO = ReservationDTO.builder()
                 .firstDate(currentApp.getFirstDate())
                 .lastDate(currentApp.getLastDate())
@@ -84,8 +82,13 @@ public class ApplicationService {
 
     private List<Room> findApplicationRoomsByFilter(ReservationDTO reservationDTO) {
         List<Room> rooms = roomRepository.findAll();
-        rooms = rooms.stream().filter(x -> x.getRoomClass().equals(reservationDTO.getRoomClass())
-                && orderService.isReservationDateValid(reservationDTO)).collect(Collectors.toList());
+        rooms = rooms.stream().filter(x -> {
+            if (x.getRoomClass().equals(reservationDTO.getRoomClass())) {
+                reservationDTO.setRoomId(x.getId());
+                return orderService.isReservationDateValid(reservationDTO);
+            }
+            return false;
+        }).collect(Collectors.toList());
         return rooms;
     }
 

@@ -3,16 +3,16 @@ package com.example.demo.service;
 import com.example.demo.DAO.OrderRepository;
 import com.example.demo.DAO.RoomRepository;
 import com.example.demo.DTO.ReservationDTO;
-import com.example.demo.model.*;
+import com.example.demo.model.Order;
+import com.example.demo.model.Room;
+import com.example.demo.model.User;
 import lombok.AllArgsConstructor;
 import net.sf.jasperreports.engine.*;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import org.apache.log4j.Logger;
-import org.jfree.util.Log;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import javax.activation.DataHandler;
@@ -30,7 +30,6 @@ import javax.transaction.Transactional;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoField;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -44,7 +43,8 @@ public class OrderService {
 
     private OrderRepository orderRepository;
     private InvoiceService invoiceService;
-    final static Logger logger = Logger.getLogger(OrderService.class);
+    private static final Logger logger = Logger.getLogger(OrderService.class);
+    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
 
     private RoomRepository roomRepository;
 
@@ -72,26 +72,29 @@ public class OrderService {
         return null;
     }
 
-    public boolean isReservationDateValid(ReservationDTO reservationDTO) {
-        Optional<Integer> counted = roomRepository.countIntersectionDateQuantity(reservationDTO.getRoomId(),
-                reservationDTO.getLastDate(), reservationDTO.getFirstDate());
-        return counted.isEmpty();
+    protected boolean isReservationDateValid(ReservationDTO reservationDTO) {
+        return roomRepository.countIntersectionDateQuantity(reservationDTO.getRoomId(),
+                reservationDTO.getLastDate(), reservationDTO.getFirstDate()).isEmpty();
+
     }
 
-    public String[] splitDateToFirstDateAndLastDate(String date) {
+    protected String[] splitDateToFirstDateAndLastDate(String date) {
         return date.split(" - ");
     }
 
-    public void orderRoomById(String dateRange, Long id, User currentUser) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
-        String[] dates = splitDateToFirstDateAndLastDate(dateRange);
+    protected ReservationDTO createReservationDTO(String[] dates, Long id) {
 
-        ReservationDTO reservationDTO = ReservationDTO.builder()
+        return ReservationDTO.builder()
                 .firstDate(LocalDate.parse(dates[0], formatter))
                 .lastDate(LocalDate.parse(dates[1], formatter))
                 .roomId(id)
                 .roomClass(roomRepository.findById(id).get().getRoomClass())
                 .build();
+    }
+
+    public void orderRoomById(String dateRange, Long id, User currentUser) {
+        String[] dates = splitDateToFirstDateAndLastDate(dateRange);
+        ReservationDTO reservationDTO = createReservationDTO(dates, id);
 
         orderRoom(reservationDTO, currentUser);
     }
@@ -107,11 +110,11 @@ public class OrderService {
         createOrder(room, currentUser, reservationDTO);
     }
 
-    private void generateReport(Order order) {
+    protected void generateReport(Order order) {
 
         final String username = "hotelCaliforniaKyiv@gmail.com";
         final String password = "bpmbmgbemyypqrln";
-        String recipientEmail = "rapturelilpeep@gmail.com";
+        String recipientEmail = "artem.zhuravskyi22@gmail.com";
 
         Properties prop = new Properties();
         prop.put("mail.smtp.host", "smtp.gmail.com");
@@ -156,43 +159,34 @@ public class OrderService {
     }
 
 
-
+    @Transactional
     public void payOrder(Long id, User currentUser) {
 
         Order order = orderRepository.findByClientAndId(currentUser, id);
         invoiceService.createInvoice(order);
-
-//        generateReport(currentUser,);
-
-//        if (isDateExpired(order)) {
-//            withDrawPayment(order);
-//        }
-
-        Invoice invoice = order.getInvoice();
         order.setStatus(PAID);
-        invoiceService.payInvoice(invoice);
+        orderRepository.save(order);
         generateReport(order);
     }
 
 
     @Transactional
-    public void withDrawPayment(Order order) {
+    public void withdrawPayment(Order order) {
         orderRepository.delete(order);
     }
-//
-//    @Transactional
-//    @Scheduled(fixedDelay = 100000)
-//    public void scheduleFixedRateTask() {
-//        System.out.println("Hello");
-//        List<Order> order = orderRepository.findAllByStatus(NOT_PAID);
-//        order.stream().filter(this::isDateExpired).forEach(this::withDrawPayment);
-//    }
+
+    @Transactional
+    @Scheduled(fixedDelay = 100000)
+    public void scheduleFixedRateTask() {
+        List<Order> order = orderRepository.findAllByStatus(NOT_PAID);
+        order.stream().filter(this::isDateExpired).forEach(this::withdrawPayment);
+    }
 
     private boolean isDateExpired(Order order) {
         return LocalDate.now().isAfter(order.getCreationDate().plusDays(2));
     }
 
-    private Long setOrderPrice(Room room, ReservationDTO reservationDTO) {
+    protected Long calculateOrderPrice(Room room, ReservationDTO reservationDTO) {
 
         long lengthOfStay = countLengthOfStay(reservationDTO);
 
@@ -208,20 +202,20 @@ public class OrderService {
         return ChronoUnit.DAYS.between(reservationDTO.getFirstDate(), reservationDTO.getLastDate()) + 1L;
     }
 
-    public void createOrder(Room room, User currentUser, ReservationDTO reservationDTO) {
+    protected void createOrder(Room room, User currentUser, ReservationDTO reservationDTO) {
         Order order = Order.builder()
                 .room(room)
                 .client(currentUser)
                 .firstDate(reservationDTO.getFirstDate())
                 .lastDate(reservationDTO.getLastDate())
                 .creationDate(LocalDate.now())
-                .price(setOrderPrice(room, reservationDTO))
+                .price(calculateOrderPrice(room, reservationDTO))
                 .status(NOT_PAID)
                 .build();
         orderRepository.save(order);
     }
 
-    public List<Long> ordersToDates(List<Order> orders) {
+    public List<Long> findAllReservedDates(List<Order> orders) {
         ZoneId zoneId = ZoneId.systemDefault();
         logger.info("Orders: " + orders);
         return orders.stream()
@@ -240,14 +234,14 @@ public class OrderService {
         List<LocalDate> dateList = new ArrayList<>();
         LocalDate temp = firstDate;
         dateList.add(temp);
-        while(!temp.equals(lastDate)) {
+        while (!temp.equals(lastDate)) {
             temp = temp.plusDays(1);
             dateList.add(temp);
         }
         return dateList;
     }
 
-    public List<Order> findOrdersWithPaginationAndSort(User client, int pageNum, int pageSize, String sorting){
+    public List<Order> findOrdersWithPaginationAndSort(User client, int pageNum, int pageSize, String sorting) {
         return orderRepository.findAllByClient(client, PageRequest.of(pageNum, pageSize).withSort(Sort.by(sorting)));
     }
 

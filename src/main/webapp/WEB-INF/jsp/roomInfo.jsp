@@ -1,5 +1,8 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+
+<fmt:setBundle basename="messages"/>
 <!doctype html>
 <html lang="en">
 <head>
@@ -10,7 +13,7 @@
     <meta name="author" content="zhuravksuyio arte,m">
     <meta name="generator" content="Hugo 0.84.0">
     <meta name="theme-color" content="#7952b3">
-    <title>Room Information</title>
+    <title><fmt:message key="room_info_title"/></title>
 
     <style>
         .custom {
@@ -40,7 +43,7 @@
 
             <img class="col-3" src="img/border.png" style="height: 90px; object-fit: cover">
             <h1 class="col-4 col-md-auto d-flex align-self-center justify-content-center mx-4">
-                ${room.getRoomClass().toString()} • Номер №${room.getId()}</h1>
+                <fmt:message key="${room.getRoomClass().toString()}"/> • <fmt:message key="room_num"/>${room.getId()}</h1>
             <img class="col-3" src="img/border.png" style="height: 90px; object-fit: cover">
         </div>
 
@@ -81,8 +84,8 @@
             <div class="row pt-3">
                 <div class="col">
                     <div class="card-body position-relative " style="left: 200px; width: 276px">
-                        <h4 class="text-center fw-bold">Удобства</h4>
-                        <p class="text-center">Кодиционер, ванная, две кровати, балкон</p>
+                        <h4 class="text-center fw-bold"><fmt:message key="room_facilities"/></h4>
+                        <p class="text-center"><fmt:message key="room_facilities_desc"/></p>
                     </div>
                 </div>
                 <div class="col">
@@ -90,11 +93,11 @@
                         <table class="table table-borderless" >
                             <tbody>
                             <tr>
-                                <td class="fw-bold">Person</td>
+                                <td class="fw-bold"><fmt:message key="person"/></td>
                                 <td class="float-end">${room.getPersonNumber()}</td>
                             </tr>
                             <tr>
-                                <td class="fw-bold">Price</td>
+                                <td class="fw-bold"><fmt:message key="price"/></td>
                                 <td class="float-end">${room.getPrice()}</td>
                             </tr>
                             </tbody>
@@ -106,34 +109,14 @@
                 <img class="col-3 me-5" src="img/border.png" style="height: 90px; width: 300px; object-fit: cover">
                 <div class="col-2 h-75 align-self-center">
                     <a href="order-room-${id}">
-                    <button type="submit" id="button" class="col-12 btn-lg" >Order</button>
+                    <button type="submit" id="button" class="col-12 btn-lg" ><fmt:message key="order_button"/></button>
                     </a>
                 </div>
                 <img class="col-3 ms-5" src="img/border.png" style="height: 90px; width: 300px; object-fit: cover">
             </div>
             <div class="card-body text-center">
                 <div class="container">
-                    <p>Оснащення номера
-                        широке двоспальне ліжко
-                        кондиціонер
-                        безкоштовний Wi-Fi до 500 Кбіт/с
-                        кабельне телебачення
-                        міський телефонний зв'язок
-                        У вартість включено
-                        сніданок у ресторані (шведський стіл) - з 07:00 до 10:30
-                        безкоштовний WI-FI до 500 Кбіт/с
-                        служба телефонних операторів (послуга "Wake up" за проханням гостя)
-                        міський телефонний зв'язок у межах Києва
-                        кабельне телебачення (31 канал)
-                        інформаційний термінал у холі готелю
-                        гардероб
-                        прибирання номера
-                        цілодобова охорона
-                        виклик таксі
-                        Також в номері
-                        прибирання номеру – щодня
-                        зміна рушників – щодня
-                        зміна постільної білизни - 1 раз в 3 дня</p>
+                    <p><fmt:message key="room_info_description"/></p>
 
                 </div>
             </div>

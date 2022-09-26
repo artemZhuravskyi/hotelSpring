@@ -1,9 +1,12 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+
+<fmt:setBundle basename="messages"/>
 <html>
 <head>
-    <title>Orders</title>
+    <title><fmt:message key="orders_announcement"/></title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta content="text/html; charset=UTF-8" http-equiv="Content-Type">
@@ -31,132 +34,137 @@
 </head>
 <body>
 <jsp:include page="blocks/header.jsp"/>
-<main class="custom pt-5">
+<main class="custom pt-5 mt-5">
     <section class="mt-1 text-center h-0"
-             style="background: rgb(230,255,255) linear-gradient(180deg, rgba(230,255,255,1) 80%, rgba(255,255,255,1) 100%);">
+             style="background: rgb(255,255,255);
+background: linear-gradient(0deg, rgba(255,255,255,1) 0%, rgba(230,255,255,1) 25%, rgba(230,255,255,1) 50%, rgba(230,255,255,1) 75%, rgba(255,255,255,1) 100%);">
         <div class="py-lg-3 d-flex align-self-center justify-content-center">
             <div class="col-lg-6 col-md-8 mx-auto">
-                <h1 class="fw-light fw-bold">Your Orders</h1>
-                <p class="lead text-muted">Here displays all your already paid and still not paid orders </p>
+                <h1 class="fw-light fw-bold"><fmt:message key="orders_announcement"/></h1>
+                <p class="lead text-muted"><fmt:message key="orders_announcement_description"/></p>
                 <div class="col-4 d-grid mx-auto h-25">
                 </div>
             </div>
         </div>
     </section>
 
-    <div class="container mt-5 py-2 border-warning border rounded">
 
-        <div class="col-12 row ">
-
-
-            <%--        </div>--%>
-            <%--        <div class="col-12 row ">--%>
-            <div class="row col-3">
-                <div class="col-12 "></div>
-                <div class="col-12 text-center">
-                    <h2 class=" border-bottom border-warning pb-2" style="display: inline-block">Confirm orders</h2>
-                </div>
+    <c:set var="paid">${orders.stream().filter(order -> order.getStatus() == 'PAID').count()}</c:set>
+    <c:set var="notPaid">${orders.stream().filter(order -> order.getStatus() == 'NOT_PAID').count()}</c:set>
+    <c:choose>
+        <c:when test="${orders.size() == 0}">
+            <div class="position-absolute top-50 start-50 translate-middle border-bottom border-warning">
+                <h1><fmt:message key="orders_description"/></h1>
             </div>
-            <%--    <div class="col-8 " style="width: 69%">--%>
-            <%--    </div>--%>
-            <div class="col-9 row">
-                <div class="col-10">
+        </c:when>
+        <c:otherwise>
+            <div class="container mt-5 py-2 border-warning border rounded">
+                <c:if test="${notPaid > 0}">
+                    <div class="col-12 row ">
 
-                    <table class="table">
-                        <thead>
-                        <form action="/orders">
-                            <tr>
-                                <th scope="col" style="border-color: #ffc107;">
-                                    <%--                                <input type="submit" class="border border-0 bg-body fw-bold" name="sorting" value="id">--%>
-                                    id
-                                </th>
-                                <th scope="col" style="border-color: #ffc107;">
-                                    <%--                                <input type="submit" class="border border-0 bg-body fw-bold" name="sorting" value="room.roomClass">--%>
-                                    Room Class
-                                </th>
-                                <th scope="col" style="border-color: #ffc107;">
-                                    <%--                                <input type="submit" class="border border-0 bg-body fw-bold" name="sorting" value="firstDate">--%>
-                                    First Date
-                                </th>
-                                <th scope="col" style="border-color: #ffc107;">
-                                    <%--                                <input type="submit" class="border border-0 bg-body fw-bold" name="sorting" value="lastDate">--%>
-                                    Last Date
-                                </th>
-                                <th scope="col" style="border-color: #ffc107;">
-
-                                    <%--                                <input type="submit" class="border border-0 bg-body fw-bold" name="sorting" value="Price">--%>
-                                    Price
-
-                                </th>
-
-                            </tr>
-                        </form>
-                        </thead>
-
-                        <%--                    <div class="col-9 row">--%>
-                        <c:forEach items="${orders}" var="order">
-                        <c:if test="${order.getStatus() == 'NOT_PAID'}">
-                        <tbody>
-                        <tr>
-                            <th scope="row" style="border-color: #ffc107;">${order.getId()}</th>
-                            <td style="border-color: #ffc107;">${order.getRoom().getRoomClass().toString()}</td>
-                            <td style="border-color: #ffc107;">${order.getFirstDate()}</td>
-                            <td style="border-color: #ffc107;">${order.getLastDate()}</td>
-                            <td style="border-color: #ffc107;">${order.getPrice()}</td>
-                        </tr>
-                            <%--            </div>--%>
-                        </c:if>
-                        </c:forEach>
-                        </tbody>
-                    </table>
-                </div>
-                <div class="col-2 row" style="display:inline-block; margin-top: 84px">
-                    <c:forEach items="${orders}" var="order">
-                        <c:if test="${order.getStatus() == 'NOT_PAID'}">
-                            <div class="col-10 mb-1">
-                                <form action="/pay-order/${order.getId()}" class="my-0" method="post">
-                                    <input class="form-control form-control-sm btn btn-sm border border-warning"
-                                           type="submit" value="Pay"/>
-                                </form>
+                        <div class="row col-3">
+                            <div class="col-12 "></div>
+                            <div class="col-12 text-center">
+                                <h2 class=" border-bottom border-warning pb-2" style="display: inline-block">
+                                    <fmt:message
+                                            key="confirm_orders"/></h2>
                             </div>
-                        </c:if>
-                    </c:forEach>
-                </div>
+                        </div>
+
+                        <div class="col-9 row">
+                            <div class="col-10">
+
+                                <table class="table">
+                                    <thead>
+                                    <form action="/orders">
+                                        <tr>
+                                            <th scope="col" style="border-color: #ffc107;">id</th>
+                                            <th scope="col" style="border-color: #ffc107;"><fmt:message
+                                                    key="room_class"/></th>
+                                            <th scope="col" style="border-color: #ffc107;"><fmt:message
+                                                    key="first_date"/></th>
+                                            <th scope="col" style="border-color: #ffc107;"><fmt:message
+                                                    key="last_date"/></th>
+                                            <th scope="col" style="border-color: #ffc107;"><fmt:message
+                                                    key="price"/></th>
+                                        </tr>
+                                    </form>
+                                    </thead>
+
+                                    <c:forEach items="${orders}" var="order">
+                                    <c:if test="${order.getStatus() == 'NOT_PAID'}">
+                                    <tbody>
+                                    <tr>
+                                        <th scope="row" style="border-color: #ffc107;">${order.getId()}</th>
+                                        <td style="border-color: #ffc107;"><fmt:message
+                                                key="${order.getRoom().getRoomClass().toString()}"/></td>
+                                        <td style="border-color: #ffc107;">${order.getFirstDate()}</td>
+                                        <td style="border-color: #ffc107;">${order.getLastDate()}</td>
+                                        <td style="border-color: #ffc107;">${order.getPrice()}</td>
+                                    </tr>
+                                        <%--            </div>--%>
+                                    </c:if>
+                                    </c:forEach>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="col-2 row" style="display:inline-block; margin-top: 84px">
+                                <c:forEach items="${orders}" var="order">
+                                    <c:if test="${order.getStatus() == 'NOT_PAID'}">
+                                        <div class="col-10 mb-1">
+                                            <form action="/pay-order-${order.getId()}" class="my-0" method="post">
+                                                <input class="form-control form-control-sm btn btn-sm border border-warning"
+                                                       type="submit" value="<fmt:message key="pay"/>"/>
+                                            </form>
+                                        </div>
+                                    </c:if>
+                                </c:forEach>
+                            </div>
+                        </div>
+                    </div>
+                </c:if>
+                <c:if test="${(paid > 0 && notPaid > 0 )}">
+                    <br>
+                    <br>
+                    <div class="col-10 border-bottom border-warning ms-4 mb-2" style="width: 95%"></div>
+                </c:if>
+                <br>
+                <c:if test="${paid > 0}">
+                    <div class="col-12 row">
+                        <div class="text-center mt-1" style=" width: 23%">
+                            <h2 class="border-bottom border-warning pb-2" style="display: inline-block;"><fmt:message
+                                    key="payed_orders"/></h2>
+                        </div>
+                        <div class="col-8" style="">
+                                <%--                <table class="table" style="border-color: #ffc107;">--%>
+
+
+                            <table class="table mt-1" style="border-color: #ffc107; width: 91%">
+                                <tbody>
+                                <c:forEach items="${orders}" var="order">
+                                    <c:if test="${order.getStatus() == 'PAID'}">
+                                        <tr>
+                                            <th style="border-color: #ffc107;" scope="row">${order.getId()}</th>
+                                            <td style="border-color: #ffc107;"><fmt:message
+                                                    key="${order.getRoom().getRoomClass().toString()}"/></td>
+                                            <td style="border-color: #ffc107;">${order.getFirstDate()}</td>
+                                            <td style="border-color: #ffc107;">${order.getLastDate()}</td>
+                                            <td style="border-color: #ffc107;">${order.getPrice()}</td>
+                                        </tr>
+                                    </c:if>
+                                </c:forEach>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                </c:if>
+                <br>
             </div>
-        </div>
-
-        <br>
-        <br>
-        <div class="col-10 border-bottom border-warning ms-4 mb-2" style="width: 95%"></div>
-        <br>
-        <div class="col-12 row">
-            <div class="text-center mt-1" style=" width: 23%">
-                <h2 class="border-bottom border-warning pb-2" style="display: inline-block;">Payed orders</h2>
-            </div>
-            <div class="col-8" style="">
-                <%--                <table class="table" style="border-color: #ffc107;">--%>
+        </c:otherwise>
+    </c:choose>
 
 
-                <table class="table mt-1" style="border-color: #ffc107; width: 91%">
-                    <tbody>
-                    <c:forEach items="${orders}" var="order">
-                        <c:if test="${order.getStatus() == 'PAID'}">
-                            <tr>
-                                <th style="border-color: #ffc107;" scope="row">${order.getId()}</th>
-                                <td style="border-color: #ffc107;">${order.getRoom().getRoomClass().toString()}</td>
-                                <td style="border-color: #ffc107;">${order.getFirstDate()}</td>
-                                <td style="border-color: #ffc107;">${order.getLastDate()}</td>
-                                <td style="border-color: #ffc107;">${order.getPrice()}</td>
-                            </tr>
-                        </c:if>
-                    </c:forEach>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-
-    </div>
 </main>
 
 

@@ -23,11 +23,4 @@ public class Invoice {
     @JoinColumn(name = "order_id")
     private Order order;
 
-    private Status status;
-
-    public enum Status {
-        NOT_PAID,
-        PAID
-    }
-
 }

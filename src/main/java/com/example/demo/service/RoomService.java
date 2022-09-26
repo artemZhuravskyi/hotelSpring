@@ -18,8 +18,6 @@ import java.util.Optional;
 public class RoomService {
 
     private final RoomRepository roomRepository;
-    private final OrderService orderService;
-    private final ApplicationRepository applicationRepository;
 
     public Room showRoom(Long id) {
         return roomRepository.findById(id).get();

@@ -28,16 +28,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http
                 .csrf().disable()
                 .authorizeRequests()
-//                .mvcMatchers("/allUsers", "/allRequests").hasRole("ADMIN")
-                .mvcMatchers("/userPage").hasAnyRole("ADMIN", "USER", "LIBRARIAN")
-
-//                .mvcMatchers("/makePayment", "/addMoney", "/allPayments", "/addCardName").hasRole("USER")
-                .mvcMatchers("/**")
-                .permitAll()
+                .mvcMatchers("/all-applications").hasRole("MANAGER")
+                .mvcMatchers("/create-application", "/orders", "/client-applications").hasRole("USER")
+                .mvcMatchers( "/logout").hasAnyRole("MANAGER", "USER")
+                .mvcMatchers("/**").permitAll()
                 .and()
                 .formLogin()
-                .loginPage("/login")
-                .permitAll()
+                .loginPage("/login").permitAll()
                 .defaultSuccessUrl("/all-rooms", true)
                 .failureUrl("/login?error");
     }

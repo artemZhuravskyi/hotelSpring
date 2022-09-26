@@ -246,25 +246,5 @@
             </textField>
         </band>
     </detail>
-    <lastPageFooter>
-        <band height="177">
-            <staticText>
-                <reportElement positionType="Float" x="-1" y="30" width="261" height="101" uuid="1a0d7088-5af7-4865-8be1-41ec5f51fb36"/>
-                <box>
-                    <topPen lineWidth="1.1" lineStyle="Dashed"/>
-                    <leftPen lineWidth="1.1" lineStyle="Dashed"/>
-                    <bottomPen lineWidth="1.1" lineStyle="Dashed"/>
-                    <rightPen lineWidth="1.1" lineStyle="Dashed"/>
-                </box>
-                <text><![CDATA[Your notes here]]></text>
-            </staticText>
-            <staticText>
-                <reportElement positionType="Float" mode="Opaque" x="0" y="147" width="556" height="30" backcolor="#E6E8E9" uuid="36aa233d-4305-48e6-974a-1bbf89bb3c8f"/>
-                <textElement textAlignment="Center" verticalAlignment="Middle">
-                    <font fontName="Serif" size="9" isItalic="true"/>
-                </textElement>
-                <text>THANK YOU FOR YOUR BUSINESS</text>
-            </staticText>
-        </band>
-    </lastPageFooter>
+
 </jasperReport>
